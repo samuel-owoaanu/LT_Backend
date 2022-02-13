@@ -7,4 +7,4 @@ class CourseDetailsAdmin(admin.ModelAdmin):
     search_fields = ('course_code', 'course_title',)
 
 admin.site.register(CourseDetails, CourseDetailsAdmin)
-admin.site.register(Timetable)
+admin.site.register(StudentTimetable)
