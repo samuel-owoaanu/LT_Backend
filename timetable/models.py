@@ -79,6 +79,9 @@ class Level(models.Model):
 class Role(models.Model):
     role_name =models.CharField(max_length=30, blank=True)
     role_code = models.CharField(max_length=3, blank=True)
+    
+    def __str__(self):
+        return str(self.role_name)
     class Meta:
         verbose_name_plural = "Role"
 
@@ -90,7 +93,7 @@ class Student(models.Model):
     dept = models.ForeignKey(Department, on_delete=models.CASCADE)
 
     def __str__(self) -> str:
-        return  self.user.first_name + " "+self.user.other_names[0]+". "+self.user.last_name+" "+str(self.level)
+        return  self.user.first_name + " "+self.user.other_name [0]+". "+self.user.last_name+" "+str(self.level)
 
     class Meta:
         verbose_name_plural = 'Student'
@@ -107,6 +110,9 @@ class Staff(models.Model):
     user = models.OneToOneField(a_models.User, on_delete=models.CASCADE)
     staff_number = models.CharField(max_length=20, blank=False, default="")
     role = models.ForeignKey(Role, on_delete=models.CASCADE)
+    
+    def __str__(self):
+        return self.user
     class Meta:
         verbose_name_plural = 'Staff'
 
@@ -155,7 +161,7 @@ class Timetable(models.Model):
     venue = models.ForeignKey(Venue, on_delete=models.CASCADE)
     
     def __str__(self):
-        return self.courses+" ("+self.day+" "+self.venue+")"
+        return str(self.courses)+" ("+self.day+" "+str(self.venue)+")"
     
     
     
