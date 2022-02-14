@@ -33,51 +33,52 @@ class UserManager(BaseUserManager):
 
 
 class User(AbstractBaseUser, PermissionsMixin):
+    GENDER=(
+        ('M','Male' ),
+        ('F', 'Female')
+    )
     email = models.EmailField(_('email_address'), unique=True)
-    first_name = models.CharField(max_length=100, blank=False)
-    last_name = models.CharField(max_length=100, blank=False)
-    other_name = models.CharField(max_length=100, blank=True, default=None, null=True)
-    date_joined = models.DateTimeField(_('date_joined'), default=timezone.now)
-    is_active = models.BooleanField(_('active'), default=False)
-    is_staff = models.BooleanField(_('staff'), blank=False)
+    first_name = models.CharField(max_length=50, blank=False)
+    other_names = models.CharField(max_length=50, blank=False)
+    last_name = models.CharField(max_length=50, blank=False)
+    phone = models.CharField(max_length=11, blank=False)
+    gender = models.CharField(max_length=1, choices=GENDER, blank=False)
+    date_joined = models.DateTimeField((_('date_joined')), auto_now_add=True)
+    is_active = models.BooleanField((_('is_active')), default=True)
+    is_staff = models.BooleanField((_('is_staff')), default=False)
 
+    objects = UserManager()
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
 
-    objects = UserManager()
-
-    def __str__(self):
-        return self.email
-    
     class Meta:
-        verbose_name_plural = _('users')
+        verbose_name_plural = 'User'
+# class Student(models.Model):
+#     DEPARTMENT = (
+#         ('csc', 'Computer Science'),
+#         ('bch', 'BioChemistry'),
+#         ('mcb', 'MicroBiology'),
+#     )
 
-class Student(models.Model):
-    DEPARTMENT = (
-        ('csc', 'Computer Science'),
-        ('bch', 'BioChemistry'),
-        ('mcb', 'MicroBiology'),
-    )
+#     FACULTY = (
+#         ('fsc', 'Faculty of Science'),
+#         ('mbbs', 'Medicine and Surgery'),
+#         ('law', 'Faculty of Law'),
+#     )
+#     user = models.OneToOneField(User, on_delete=models.CASCADE, blank=True, null=True)
+#     mat_no = models.CharField(max_length=30, blank=True, null=True)
+#     department = models.CharField(choices=DEPARTMENT, blank=False, max_length=7)
+#     faculty = models.CharField(choices=FACULTY, blank=False, max_length=7)
+#     level = models.CharField(max_length=6, blank=False)
+#     reg_date = models.DateTimeField(auto_now_add=True)
 
-    FACULTY = (
-        ('fsc', 'Faculty of Science'),
-        ('mbbs', 'Medicine and Surgery'),
-        ('law', 'Faculty of Law'),
-    )
-    user = models.OneToOneField(User, on_delete=models.CASCADE, blank=True, null=True)
-    mat_no = models.CharField(max_length=30, blank=True, null=True)
-    department = models.CharField(choices=DEPARTMENT, blank=False, max_length=7)
-    faculty = models.CharField(choices=FACULTY, blank=False, max_length=7)
-    level = models.CharField(max_length=6, blank=False)
-    reg_date = models.DateTimeField(auto_now_add=True)
+#     def __str__(self):
+#         return self.user.email
 
-    def __str__(self):
-        return self.user.email
-
-class Semester(models.Model):
-    SEMESTER_TYPE = (
-        ('1st', 'First Semester'),
-        ('2nd', 'Second Semester'),
-    )
-    semester_session = models.DateField()
-    semester_type = models.CharField(choices=SEMESTER_TYPE, max_length=4)
+# class Semester(models.Model):
+#     SEMESTER_TYPE = (
+#         ('1st', 'First Semester'),
+#         ('2nd', 'Second Semester'),
+#     )
+#     semester_session = models.DateField()
+#     semester_type = models.CharField(choices=SEMESTER_TYPE, max_length=4)
