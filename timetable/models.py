@@ -1,10 +1,15 @@
 from django.db import models
 
+
+from accounts import models as a_models
+
+
 # This is used for translation
 from django.utils.translation import deactivate, gettext_lazy as _
 from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
 from django.contrib.auth.models import PermissionsMixin
 from  accounts import models as a_models
+
 
 
 # Create your models here.
@@ -24,6 +29,8 @@ class Department(models.Model):
     def __str__(self) -> str:
         return self.dept_name
 
+
+
 class Level(models.Model):
     level_name = models.IntegerField( blank=False)
 
@@ -35,6 +42,10 @@ class Level(models.Model):
 class Role(models.Model):
     role_name =models.CharField(max_length=30, blank=True)
     role_code = models.CharField(max_length=3, blank=True)
+    
+    def __str__(self):
+        return str(self.role_name)
+
     class Meta:
         verbose_name_plural = "Role"
 
@@ -46,7 +57,7 @@ class Student(models.Model):
     dept = models.ForeignKey(Department, on_delete=models.CASCADE)
 
     def __str__(self) -> str:
-        return  self.user.first_name + " "+self.user.other_names[0]+". "+self.user.last_name+" "+str(self.level)
+        return  self.user.first_name + " "+self.user.other_name [0]+". "+self.user.last_name+" "+str(self.level)
 
     class Meta:
         verbose_name_plural = 'Student'
@@ -63,6 +74,9 @@ class Staff(models.Model):
     user = models.OneToOneField(a_models.User, on_delete=models.CASCADE)
     staff_number = models.CharField(max_length=20, blank=False, default="")
     role = models.ForeignKey(Role, on_delete=models.CASCADE)
+    
+    def __str__(self):
+        return self.user
     class Meta:
         verbose_name_plural = 'Staff'
 
@@ -71,10 +85,12 @@ class Course(models.Model):
         ('A','Approved' ),
         ('D', 'Discontinued')
     )
+
     SEMESTER=(
         ('F','First Semester' ),
         ('S', 'Second Semester')
     )
+
     course_name = models.CharField(max_length=200, blank=False)
     course_code = models.CharField(max_length=50, blank=False, unique =True)
     credit_unit = models.IntegerField(blank=False)
@@ -93,6 +109,32 @@ class Course(models.Model):
     class Meta:
         verbose_name_plural = "Course"
 
+class Venue(models.Model):
+    venue_name = models.CharField(max_length=30)
+    venue_code =models.CharField(max_length=6)
+    
+    def __str__(self):
+        return self.venue_name
+class Timetable(models.Model):
+    D = (
+        ('Sun', 'Sunday'),
+        ('Mon', 'Monday'),
+        ('Tue', 'Tuesday'),
+        ('Wed', 'Wednesday'),
+        ('Thur', 'Thursday'),
+        ('Fri', 'Friday'),
+        ('Sat', 'Saturday'),
+    
+    )
+    courses = models.ForeignKey(Course, on_delete=models.CASCADE)
+    day = models.CharField(choices=D, max_length=20)
+    start_time = models.TimeField()
+    end_time = models.TimeField()
+    venue = models.ForeignKey(Venue, on_delete=models.CASCADE)
+    
+    def __str__(self):
+        return str(self.courses)+" ("+self.day+" "+str(self.venue)+")"
+    
 class Grade(models.Model):
     grade_code = models.CharField(max_length=2, blank=False)
     grade_point = models.IntegerField(blank=False)
@@ -100,8 +142,7 @@ class Grade(models.Model):
     def __str__(self) -> str:
         return self.grade_code+" ("+str(self.grade_point)+")"
 
-# class Remark(models.Model):
-#     pass
+
 class Result(models.Model):
     SEMESTER=(
         ('F','First Semester' ),
@@ -121,4 +162,5 @@ class Result(models.Model):
         return "("+str(self.session)+") "+str(self.student.mat_no)+" ("+str(self.course.course_code)+" | "+str(self.grade)+")"
     class Meta:
         unique_together = ('student', 'course', 'session')
+
 

@@ -53,32 +53,3 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     class Meta:
         verbose_name_plural = 'User'
-# class Student(models.Model):
-#     DEPARTMENT = (
-#         ('csc', 'Computer Science'),
-#         ('bch', 'BioChemistry'),
-#         ('mcb', 'MicroBiology'),
-#     )
-
-#     FACULTY = (
-#         ('fsc', 'Faculty of Science'),
-#         ('mbbs', 'Medicine and Surgery'),
-#         ('law', 'Faculty of Law'),
-#     )
-#     user = models.OneToOneField(User, on_delete=models.CASCADE, blank=True, null=True)
-#     mat_no = models.CharField(max_length=30, blank=True, null=True)
-#     department = models.CharField(choices=DEPARTMENT, blank=False, max_length=7)
-#     faculty = models.CharField(choices=FACULTY, blank=False, max_length=7)
-#     level = models.CharField(max_length=6, blank=False)
-#     reg_date = models.DateTimeField(auto_now_add=True)
-
-#     def __str__(self):
-#         return self.user.email
-
-# class Semester(models.Model):
-#     SEMESTER_TYPE = (
-#         ('1st', 'First Semester'),
-#         ('2nd', 'Second Semester'),
-#     )
-#     semester_session = models.DateField()
-#     semester_type = models.CharField(choices=SEMESTER_TYPE, max_length=4)
