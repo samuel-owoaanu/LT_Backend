@@ -1,4 +1,5 @@
 from django.db import models
+
 # This is used for translation
 from django.utils.translation import deactivate, gettext_lazy as _
 from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
@@ -120,3 +121,4 @@ class Result(models.Model):
         return "("+str(self.session)+") "+str(self.student.mat_no)+" ("+str(self.course.course_code)+" | "+str(self.grade)+")"
     class Meta:
         unique_together = ('student', 'course', 'session')
+
