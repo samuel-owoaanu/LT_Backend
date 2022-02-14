@@ -1,10 +1,15 @@
 from django.db import models
 
+
 from accounts import models as a_models
+
+
 # This is used for translation
-# from django.utils.translation import deactivate, gettext_lazy as _
-# from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
-# from django.contrib.auth.models import PermissionsMixin
+from django.utils.translation import deactivate, gettext_lazy as _
+from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
+from django.contrib.auth.models import PermissionsMixin
+from  accounts import models as a_models
+
 
 
 # Create your models here.
@@ -23,51 +28,8 @@ class Department(models.Model):
 
     def __str__(self) -> str:
         return self.dept_name
-# User-Based Models
 
-# class UserManager(BaseUserManager):
-#     def create_user(self, email, password, **extra_fields):
-#         if not email:
-#             raise ValueError(_('Please, enter a Valid email address'))
-#         email = self.normalize_email(email)
-#         user = self.model(email=email, **extra_fields)
-#         user.set_password(password)
-#         user.save()
-#         return user
 
-#     def create_superuser(self, email, password, **extra_fields):
-#         extra_fields.setdefault('is_staff', True)
-#         extra_fields.setdefault('is_superuser', True)
-#         extra_fields.setdefault('is_active', True)
-
-#         if extra_fields.get('is_staff') is not True:
-#             raise ValueError(_('set staff to be true'))
-#         if extra_fields.get('is_superuser') is not True:
-#             raise ValueError(_('set superuser to be true'))
-
-#         return self.create_user(email, password, **extra_fields)
-
-# class User(AbstractBaseUser, PermissionsMixin):
-#     GENDER=(
-#         ('M','Male' ),
-#         ('F', 'Female')
-#     )
-#     email = models.EmailField(_('email_address'), unique=True)
-#     first_name = models.CharField(max_length=50, blank=False)
-#     other_names = models.CharField(max_length=50, blank=False)
-#     last_name = models.CharField(max_length=50, blank=False)
-#     phone = models.CharField(max_length=11, blank=False)
-#     gender = models.CharField(max_length=1, choices=GENDER, blank=False)
-#     date_joined = models.DateTimeField((_('date_joined')), auto_now_add=True)
-#     is_active = models.BooleanField((_('is_active')), default=True)
-#     is_staff = models.BooleanField((_('is_staff')), default=False)
-
-#     objects = UserManager()
-#     USERNAME_FIELD = 'email'
-#     REQUIRED_FIELDS = []
-
-#     class Meta:
-#         verbose_name_plural = 'User'
 
 class Level(models.Model):
     level_name = models.IntegerField( blank=False)
@@ -83,6 +45,7 @@ class Role(models.Model):
     
     def __str__(self):
         return str(self.role_name)
+
     class Meta:
         verbose_name_plural = "Role"
 
@@ -122,22 +85,30 @@ class Course(models.Model):
         ('A','Approved' ),
         ('D', 'Discontinued')
     )
+
+    SEMESTER=(
+        ('F','First Semester' ),
+        ('S', 'Second Semester')
+    )
+
     course_name = models.CharField(max_length=200, blank=False)
     course_code = models.CharField(max_length=50, blank=False, unique =True)
     credit_unit = models.IntegerField(blank=False)
     c_a_score = models.IntegerField(blank=True, default=0)
     exam_score = models.IntegerField(blank=True, default=0)
     dept = models.ForeignKey(Department, on_delete=models.CASCADE)
-    lecturer = models.ForeignKey(Staff, on_delete=models.CASCADE)
+    semester = models.CharField(choices=SEMESTER, max_length=1)
     level = models.ForeignKey(Level, on_delete=models.CASCADE)
     status = models.CharField(max_length=1, choices=STATUSES, blank=False)
-
+    lecturer = models.ForeignKey(Staff, on_delete=models.CASCADE, default = None, null =True)
+    general =models.BooleanField(default=False)
 
     def __str__(self) -> str:
         return "("+self.course_code+") "+self.course_name
 
     class Meta:
         verbose_name_plural = "Course"
+
 class Venue(models.Model):
     venue_name = models.CharField(max_length=30)
     venue_code =models.CharField(max_length=6)
@@ -164,47 +135,32 @@ class Timetable(models.Model):
     def __str__(self):
         return str(self.courses)+" ("+self.day+" "+str(self.venue)+")"
     
-    
-    
+class Grade(models.Model):
+    grade_code = models.CharField(max_length=2, blank=False)
+    grade_point = models.IntegerField(blank=False)
 
-# from accounts.models import *
+    def __str__(self) -> str:
+        return self.grade_code+" ("+str(self.grade_point)+")"
 
-# # Create your models here.
 
-# class CourseDetails(models.Model):
-#     course_code = models.CharField(max_length=8, blank=False)
-#     course_title = models.CharField(max_length=30, blank=False)
-#     course_unit = models.IntegerField(blank=False)
+class Result(models.Model):
+    SEMESTER=(
+        ('F','First Semester' ),
+        ('S', 'Second Semester')
+    )
+    student = models.ForeignKey(Student, on_delete=models.CASCADE)
+    course = models.ForeignKey(Course,  on_delete=models.CASCADE)
+    c_a_score = models.DecimalField(max_digits=4, decimal_places=2, blank=True, default=0)
+    exam_score = models.DecimalField(max_digits=4, decimal_places=2, blank=True, default=0)
+    grade = models.ForeignKey(Grade, default=6, on_delete=models.CASCADE)
+    # remark = models.ForeignKey()
+    semester = models.CharField(max_length=1, choices=SEMESTER, blank=False)
+    session = models.ForeignKey(Session, on_delete=models.CASCADE, default="")
+    cleared = models.BooleanField(default=False)
 
-#     def __str__(self) -> str:
-#         return self.course_code
-#     class Meta:
-#         verbose_name_plural = 'CourseDetails'
+    def __str__(self) -> str:
+        return "("+str(self.session)+") "+str(self.student.mat_no)+" ("+str(self.course.course_code)+" | "+str(self.grade)+")"
+    class Meta:
+        unique_together = ('student', 'course', 'session')
 
-# class StudentTimetable(models.Model):
-#     VENUE = (
-#         ('NLT1', 'NEW LECTURE THEATRE 1'),
-#         ('NLT2', 'NEW LECTURE THEATRE 2'),
-#         ('NLT3', 'NEW LECTURE THEATRE 3'),
-#         ('BAS', 'BASEMENT CLASSROOM'),
-#     )
 
-#     WEEKDAY = (
-#         ('MON', 'MONDAY'),
-#         ('TUE', 'TUESDAY'),
-#         ('WED', 'WEDNESDAY'),
-#         ('THUR', 'THURSDAY'),
-#         ('FRI', 'FRIDAY'),
-#     )
-    
-#     weekday = models.CharField(choices=WEEKDAY, max_length=4, blank=False)
-#     student = models.ForeignKey(Student, on_delete=models.CASCADE)
-#     course = models.ManyToManyField(CourseDetails)
-#     time = models.TimeField()
-#     venue = models.CharField(choices=VENUE,max_length=100, blank=False)
-
-#     class Meta:
-#         verbose_name_plural = 'StudentTimetable'
-
-# class FacultyTimeTable(models.Model):
-#     pass
